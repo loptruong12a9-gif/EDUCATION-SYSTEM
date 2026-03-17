@@ -1,6 +1,6 @@
 # Hướng dẫn sử dụng App "HỌC VUI CÙNG BÉ" 🌟
 
-Chào Bác Tân! Em đã nâng cấp ứng dụng học tập cho 3 bé **Phương Thảo (Lớp 2)**, **Ngô Hải Linh (Lớp 3)** và **Ngọc Diệp (Lớp 4)**, bám sát chương trình **Kết nối tri thức với cuộc sống**.
+App "HỌC VUI CÙNG BÉ" 🌟 bám sát chương trình **Kết nối tri thức với cuộc sống**.
 
 ## 📂 Các file chính:
 - `index.html`: Giao diện chính của app.
@@ -28,4 +28,4 @@ Chào Bác Tân! Em đã nâng cấp ứng dụng học tập cho 3 bé **Phươ
 ## 🛠️ Cách cập nhật:
 Anh có thể sửa `data.js` để thay đổi lộ trình học hoặc cập nhật `SHOP_ITEMS` và `PARENT_REWARDS` để App luôn mới mẻ.
 
-Chúc ba bé Thảo, Hải Linh, Diệp học giỏi và chăm chỉ nhé! ❤️ - Phát triển bởi Bác Tân & Antigravity.
+Chúc ba bé Thảo, Hải Linh, Diệp học giỏi và chăm chỉ nhé! ❤️ - Phát triển bởi Bác Tân 
