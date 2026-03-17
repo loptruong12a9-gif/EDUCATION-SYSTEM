@@ -1,0 +1,21 @@
+{
+  "name": "Học Vui Cùng Bé",
+  "short_name": "Học Vui",
+  "description": "Ứng dụng theo dõi học tập và giải trí dành cho bé",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#7C4DFF",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/3426/3426653.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

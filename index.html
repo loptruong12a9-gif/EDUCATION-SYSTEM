@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="vi">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0" />
+  <title>HỌC VUI CÙNG BÉ - V3.0 🌟</title>
+  <meta name="description"
+    content="App học tập vui dành cho 3 bé: Phương Thảo (lớp 2), Hải Linh (lớp 3) và Ngọc Diệp (lớp 4). Học bài, tích sao, nhận thưởng!" />
+  <meta name="theme-color" content="#7C4DFF" />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+
+  <!-- Animated BG -->
+  <div class="app-bg">
+    <div class="bg-bubble"></div>
+    <div class="bg-bubble"></div>
+    <div class="bg-bubble"></div>
+    <div class="bg-bubble"></div>
+    <div class="bg-bubble"></div>
+  </div>
+
+  <div class="app-wrapper">
+
+    <!-- ====================================================
+       MÀN HÌNH CHÍNH (HOME)
+       ==================================================== -->
+    <div id="homeScreen" class="screen active">
+
+
+      <!-- Special Program Banner -->
+      <div class="special-program-banner" style="position: relative;">
+        <!-- Nút Giới Thiệu -->
+        <button class="btn-intro" onclick="document.getElementById('introModal').style.display='flex'">
+          ℹ️ GIỚI THIỆU
+        </button>
+
+        <div class="banner-floating-icons">
+          <span class="icon-1">🎓</span>
+          <span class="icon-2">✏️</span>
+          <span class="icon-3">🌈</span>
+          <span class="icon-4">🎒</span>
+        </div>
+        <div class="banner-badge">HỆ THỐNG GIÁO DỤC - HỌC VUI CÙNG BÉ</div>
+        <h2>CHƯƠNG TRÌNH GIÁO DỤC TIỂU HỌC</h2>
+        <p>✨ Kết nối tri thức với cuộc sống ✨</p>
+      </div>
+
+      <div class="home-cards">
+
+        <!-- Card bé Thảo -->
+        <div class="child-card thao" id="cardThao">
+          <div class="child-avatar">
+            <img src="avatar_thao.png" alt="Phương Thảo" onerror="this.style.display='none'">
+            🌸
+          </div>
+          <div class="child-name">Phương Thảo</div>
+          <div class="child-grade">🏫 Lớp 2</div>
+          <div class="child-stars">
+            <span class="star-badge">⭐ <span id="thaoStars">0</span></span>
+            <span class="streak-badge">🔥 <span id="thaoStreak">0</span> ngày</span>
+          </div>
+        </div>
+
+        <!-- Card bé Hải Linh -->
+        <div class="child-card hailinh" id="cardHaiLinh">
+          <div class="child-avatar">
+            <img src="avatar_hailinh.PNG" alt="Hải Linh" onerror="this.style.display='none'">
+            🦋
+          </div>
+          <div class="child-name">Hải Linh</div>
+          <div class="child-grade">🏫 Lớp 3</div>
+          <div class="child-stars">
+            <span class="star-badge">⭐ <span id="hailinhStars">0</span></span>
+            <span class="streak-badge">🔥 <span id="hailinhStreak">0</span> ngày</span>
+          </div>
+        </div>
+
+        <!-- Card bé Diệp -->
+        <div class="child-card diep" id="cardDiep">
+          <div class="child-avatar">
+            <img src="avatar_diep.png" alt="Ngọc Diệp" onerror="this.style.display='none'">
+            ⭐
+          </div>
+          <div class="child-name">Ngọc Diệp</div>
+          <div class="child-grade">🏫 Lớp 4</div>
+          <div class="child-stars">
+            <span class="star-badge">⭐ <span id="diepStars">0</span></span>
+            <span class="streak-badge">🔥 <span id="diepStreak">0</span> ngày</span>
+          </div>
+        </div>
+
+      </div><!-- /.home-cards -->
+
+      <div class="home-footer">
+        <p>👆 Nhấn vào tên để vào trang học của em</p>
+        <p style="margin-top:6px; font-weight: 800; letter-spacing: 1px;">PHÁT TRIỂN BỞI TÂN NGUYỄN - CẬP NHẬT PHIÊN BẢN
+          MỚI NHẤT V3.0</p>
+        <div class="footer-center" style="display:flex; justify-content:center; width:100%; margin-top:10px;">
+          <button class="btn-parent-shortcut" onclick="App.enterParentFromHome()">
+            ⚓ Bác Tân (Bác Quản Lý)
+          </button>
+        </div>
+      </div>
+
+    </div><!-- /#homeScreen -->
+
+    <!-- ===========================================
+         MODAL GIỚI THIỆU ỨNG DỤNG
+         =========================================== -->
+    <div id="introModal" class="praise-overlay" style="display:none; align-items:center; justify-content:center;">
+      <div class="intro-card"
+        style="background:#fff; border-radius:24px; padding:30px; width:90%; max-width:500px; max-height:85vh; overflow-y:auto; box-shadow:0 15px 40px rgba(0,0,0,0.3); text-align:left; position:relative;">
+
+        <button onclick="document.getElementById('introModal').style.display='none'"
+          style="position:absolute; top:20px; right:20px; background:var(--red); color:white; border:none; border-radius:50%; width:36px; height:36px; font-size:18px; font-weight:bold; cursor:pointer;">✕</button>
+
+        <div style="text-align:center; margin-bottom:20px;">
+          <h2 style="color:var(--blue); font-size:22px; margin-bottom:8px;">HỆ THỐNG GIÁO DỤC<br>CHƯƠNG TRÌNH TIỂU HỌC
+          </h2>
+          <div
+            style="background:var(--yellow); color:var(--text); padding:4px 12px; border-radius:12px; display:inline-block; font-weight:800; font-size:14px;">
+            BỘ SÁCH: KẾT NỐI TRI THỨC</div>
+        </div>
+
+        <h3 style="color:var(--purple); font-size:16px; margin-bottom:15px; text-align:center; line-height:1.4;">ỨNG
+          DỤNG “KẾT NỐI TRI THỨC TIỂU HỌC”<br>NGƯỜI BẠN ĐỒNG HÀNH HOÀN HẢO CHO HỌC SINH LỚP 1–5</h3>
+
+        <p style="font-size:14px; color:var(--text-secondary); margin-bottom:15px; text-align:justify;">Ứng dụng được
+          xây dựng hoàn toàn dựa trên Chương trình Giáo dục phổ thông 2018 và bộ sách giáo khoa “Kết nối tri thức” của
+          Bộ Giáo dục và Đào tạo.</p>
+
+        <ul style="list-style:none; padding:0; margin:0 0 20px 0; font-size:14px; color:var(--text);">
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Học đúng sách giáo khoa: Toán,
+              Tiếng Việt, Khoa học, Lịch sử - Địa lý, Âm nhạc, Mỹ thuật, Tin học, Tiếng Anh.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Bài giảng ngắn gọn, hình ảnh minh
+              họa sinh động, dễ hiểu.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Bài tập tương tác hấp dẫn (trắc
+              nghiệm, kéo thả, viết chữ, vẽ hình…) có chấm điểm tự động.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Ôn tập & kiểm tra theo chương, theo
+              chủ đề, theo kỳ thi.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Theo dõi tiến độ học tập chi tiết
+              cho cả học sinh và phụ huynh.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Giao diện thân thiện, tối ưu cho
+              trẻ em, hỗ trợ tiếng Việt 100%.</span></li>
+          <li style="margin-bottom:8px; display:flex; gap:8px;"><span>✅</span> <span>Chế độ học cùng phụ huynh – giám
+              sát con mọi lúc, mọi nơi.</span></li>
+        </ul>
+
+        <div
+          style="background:linear-gradient(135deg, var(--blue-light), var(--purple-light)); padding:15px; border-radius:16px; text-align:center; margin-bottom:20px;">
+          <h4 style="color:var(--purple); margin:0 0 10px 0; font-size:16px;">Học dễ – Hiểu sâu<br>Kết nối tri thức mỗi
+            ngày!</h4>
+          <p style="font-size:13px; color:var(--text); margin:0;">Ứng dụng chính thức hỗ trợ học tập hiệu quả, giúp các
+            em yêu thích môn học và đạt kết quả cao hơn.</p>
+        </div>
+
+        <div
+          style="border-top:1px dashed var(--border); padding-top:15px; font-size:13px; color:var(--text-light); text-align:center; line-height:1.6;">
+          <p style="margin:0;"><strong>Phát triển bởi:</strong> Tân Nguyễn</p>
+          <p style="margin:0;"><strong>Số điện thoại:</strong> 0367 287 102</p>
+          <p style="margin-top:10px; font-size:11px;">© Bản quyền thuộc về Tân Nguyễn. Mọi quyền được bảo lưu.</p>
+        </div>
+
+        <div style="text-align:center; margin-top:20px;">
+          <button class="btn-checkin" onclick="document.getElementById('introModal').style.display='none'"
+            style="padding:10px 30px; border-radius:30px;">
+            Xong / Đóng Lại
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ====================================================
+       MÀN HÌNH HỌC SINH
+       ==================================================== -->
+    <div id="studentScreen" class="screen">
+
+      <!-- TOP BAR -->
+      <div class="topbar">
+        <button class="btn-back" id="btnBack" aria-label="Quay lại">←</button>
+        <div class="topbar-info">
+          <div class="topbar-name">
+            <span id="topbarEmoji"></span>
+            <span id="studentName"></span>
+          </div>
+          <div class="topbar-grade">
+            <span id="studentGrade"></span> • <span style="color:var(--purple);font-weight:800">Kết nối tri thức</span>
+          </div>
+        </div>
+        <div class="topbar-stats">
+          <div class="stat-pill yellow">⭐ <span id="topbarStars">0</span></div>
+          <div class="stat-pill orange">🔥 <span id="topbarStreak">0</span></div>
+        </div>
+      </div>
+
+      <!-- TABS -->
+      <div class="tabs" role="tablist">
+        <button class="tab-btn active" data-tab="today" role="tab">📅 Hôm Nay</button>
+        <button class="tab-btn" data-tab="calendar" role="tab">🗓️ Lịch Tháng</button>
+        <button class="tab-btn" data-tab="shop" role="tab">🛒 Cửa Hàng</button>
+        <button class="tab-btn" data-tab="relax" role="tab">🎧 Giải Trí</button>
+        <button class="tab-btn" data-tab="challenge" role="tab">⚡ Thử Thách</button>
+        <button class="tab-btn" data-tab="rewards" role="tab">⭐ Phần Thưởng</button>
+        <button class="tab-btn btn-parent-tab" data-tab="parent" role="tab">⚙️ Quản Lý</button>
+      </div>
+
+      <!-- ===========================================
+         TAB: HÔM NAY
+         =========================================== -->
+      <div id="tab_today" class="tab-content active">
+
+        <!-- Date header -->
+        <div class="today-date">
+          <h2 id="todayDateLabel">Hôm nay</h2>
+          <span class="date-badge" id="todayBadge">📅 Hôm Nay</span>
+        </div>
+
+        <!-- Lời nhắc của Bác -->
+        <!-- TOP ALERTS: TRIVIA & MESSAGES -->
+        <div id="topAlertsArea" style="margin-bottom: 20px;">
+          <!-- Secret Message from Parent -->
+          <div class="secret-msg-card glass hidden" id="secretMessageBanner" onclick="this.classList.add('hidden')">
+            <div class="msg-icon">🎁</div>
+            <div class="msg-body">
+              <div class="msg-label">Tin nhắn bí mật từ Bác!</div>
+              <div class="msg-text" id="secretMessageText">...</div>
+            </div>
+            <div class="msg-close">✕</div>
+          </div>
+
+          <!-- Daily Trivia Fact -->
+          <div class="trivia-banner glass" id="dailyTrivia">
+            <span class="trivia-emoji">💡</span>
+            <div class="trivia-content">
+              <div class="trivia-label">Bé có biết không?</div>
+              <div class="trivia-text" id="triviaText">Mật ong không bao giờ bị hỏng.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="quote-card glass" id="dailyQuote">
+          <div class="quote-icon">💭</div>
+          <div class="mascot-container" id="studentMascot">
+            <span class="mascot-emoji">🐱</span>
+            <span class="mascot-bubble" id="mascotTalk">Chào bé nha!</span>
+          </div>
+          <div class="quote-content">
+            <div class="quote-label">Lời nhắn từ Bác Tân</div>
+            <div class="quote-text" id="quoteText">Hãy cố gắng mỗi ngày một chút nhé!</div>
+          </div>
+        </div>
+
+        <!-- Chủ đề tháng -->
+        <div class="theme-banner">
+          <span class="theme-emoji">🌟</span>
+          <div class="theme-text">
+            <div class="theme-label">Chủ đề tháng này</div>
+            <div class="theme-content" id="themeContent">Học tập vui vẻ</div>
+          </div>
+        </div>
+
+        <!-- Week info banner -->
+        <div class="week-info-banner" id="weekInfoBanner" style="display:none">
+          📖 <span id="weekInfoText"></span>
+        </div>
+
+        <!-- Not school alert -->
+        <div id="notSchoolAlert" style="display:none"></div>
+
+        <!-- 1. Học ở trường hôm nay -->
+        <div class="section-card school-section collapsed" id="schoolSection">
+          <div class="section-header" onclick="this.closest('.section-card').classList.toggle('collapsed')">
+            <div class="section-icon">🏫</div>
+            <div class="section-title">Học ở trường hôm nay</div>
+            <span class="section-toggle">▼</span>
+          </div>
+          <div class="section-body">
+            <div class="subject-list" id="subjectList">
+              <div class="empty-state">
+                <div class="empty-emoji">📖</div>
+                <p>Đang tải nội dung...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2. Bài tập về nhà -->
+        <div class="section-card homework-section" id="hwSection">
+          <div class="section-header" onclick="this.closest('.section-card').classList.toggle('collapsed')">
+            <div class="section-icon">✏️</div>
+            <div class="section-title">Bài tập về nhà</div>
+            <span class="section-toggle">▼</span>
+          </div>
+          <div class="section-body">
+            <div id="hwList">
+              <div class="empty-state">
+                <div class="empty-emoji">✅</div>
+                <p>Đang tải...</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3. Bài tập bổ sung -->
+        <div class="section-card bonus-section" id="bonusSection">
+          <div class="section-header" onclick="this.closest('.section-card').classList.toggle('collapsed')">
+            <div class="section-icon">🧩</div>
+            <div class="section-title">Bài tập bổ sung vui 🎯</div>
+            <span class="section-toggle">▼</span>
+          </div>
+          <div class="section-body">
+            <p style="font-size:13px;color:var(--text-secondary);margin-bottom:12px;font-weight:600">
+              💡 Làm thêm để giỏi hơn! Có thể tự làm hoặc nhờ Bác kiểm tra nhé.
+            </p>
+            <div id="bonusList"></div>
+          </div>
+        </div>
+
+        <!-- Check-in card -->
+        <div class="checkin-card" id="checkinCard">
+          <div class="checkin-question">🎓 Hôm nay em đã học xong chưa?</div>
+          <button class="btn-checkin" id="btnCheckin" data-date="">
+            ✅ Em đã học xong hôm nay!
+          </button>
+          <p style="color:rgba(255,255,255,0.8);font-size:12px;margin-top:10px;font-weight:600">
+            Nhấn để tích +1 ⭐ vào bộ sưu tập sao của em!
+          </p>
+        </div>
+
+        <!-- 4. Góc Phụ Huynh (Báo cáo tuần) -->
+        <div class="section-card parent-section collapsed" id="parentSection">
+          <div class="section-header" onclick="this.closest('.section-card').classList.toggle('collapsed')">
+            <div class="section-icon">👨‍👩‍👧‍👦</div>
+            <div class="section-title">Góc của Bác Tân (Báo cáo tuần)</div>
+            <span class="section-toggle">▼</span>
+          </div>
+          <div class="section-body" id="parentStatsBody">
+            <!-- Weekly stats will be injected here -->
+          </div>
+        </div>
+
+      </div><!-- /#tab_today -->
+
+      <!-- ===========================================
+         TAB: LỊCH THÁNG
+         =========================================== -->
+      <div id="tab_calendar" class="tab-content">
+
+        <!-- Month navigation -->
+        <div class="calendar-nav">
+          <button class="btn-nav" id="btnPrevMonth">‹</button>
+          <span class="month-title" id="calMonthTitle">Tháng 9 2025</span>
+          <button class="btn-nav" id="btnNextMonth">›</button>
+        </div>
+
+        <!-- Calendar grid -->
+        <div class="calendar-grid">
+          <div class="weekday-headers">
+            <div class="weekday-header">T2</div>
+            <div class="weekday-header">T3</div>
+            <div class="weekday-header">T4</div>
+            <div class="weekday-header">T5</div>
+            <div class="weekday-header">T6</div>
+            <div class="weekday-header" style="color:var(--pink)">T7</div>
+            <div class="weekday-header" style="color:var(--pink)">CN</div>
+          </div>
+          <div class="days-grid" id="calDaysGrid"></div>
+        </div>
+
+        <!-- Legend -->
+        <div class="calendar-legend" style="margin-bottom:16px;padding:0 4px">
+          <div class="legend-item">
+            <div class="legend-dot" style="background:linear-gradient(135deg,var(--purple),var(--pink))"></div>
+            <span>Hôm nay</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--orange-light);border:2px solid var(--orange)"></div>
+            <span>Ngày lễ</span>
+          </div>
+          <div class="legend-item">
+            <span>⭐</span>
+            <span>Đã check-in</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-dot" style="background:var(--pink-light)"></div>
+            <span>Cuối tuần</span>
+          </div>
+        </div>
+
+        <!-- Selected day detail -->
+        <div class="day-detail" id="dayDetail" style="display:none">
+          <h3 id="dayDetailTitle">Thứ Hai, 8/9/2025</h3>
+          <div id="dayDetailContent"></div>
+        </div>
+
+      </div><!-- /#tab_calendar -->
+
+      <!-- ===========================================
+         TAB: CỬA HÀNG (SHOP)
+         =========================================== -->
+      <div id="tab_shop" class="tab-content">
+        <div class="shop-header">
+          <div class="shop-stars">⭐ <span id="shopStarsCount">0</span></div>
+          <h3>🛍️ Cửa Hàng Đồ Ảo</h3>
+          <p>Dùng sao để mua thú cưng và đồ chơi nhé!</p>
+        </div>
+        <div class="shop-grid" id="shopGrid"></div>
+        <div class="inventory-section">
+          <h4>🎒 Đồ của em</h4>
+          <div class="inventory-grid" id="inventoryGrid"></div>
+        </div>
+      </div>
+
+      <!-- ===========================================
+         TAB: GIẢI TRÍ (RELAX)
+         =========================================== -->
+      <div id="tab_relax" class="tab-content">
+        <div class="relax-section">
+          <h3>🎵 Nhạc Tập Trung</h3>
+          <div class="audio-list" id="musicList"></div>
+        </div>
+        <div class="relax-section">
+          <h3>📖 Truyện Cổ Tích Audio</h3>
+          <div class="audio-list" id="storyList"></div>
+        </div>
+        <div id="audioPlayerContainer" class="audio-player-fixed" style="display:none">
+          <button class="btn-close-player" onclick="App.stopAudio()">✕</button>
+          <div class="player-info">
+            <span id="nowPlayingIcon">🎵</span>
+            <span id="nowPlayingName">Đang phát...</span>
+          </div>
+          <audio id="mainAudioPlayer" controls></audio>
+          <div class="player-controls-extra">
+            <span class="volume-icon">🔊</span>
+            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.35" class="volume-slider"
+              oninput="App.changeVolume(this.value)">
+          </div>
+        </div>
+      </div>
+
+      <!-- ===========================================
+         TAB: PHẦN THƯỞNG & SAO
+         =========================================== -->
+      <div id="tab_rewards" class="tab-content">
+
+        <!-- Stars overview -->
+        <div class="stars-overview">
+          <span class="stars-big" id="rewardStarsCount">0</span>
+          <div class="stars-label">⭐ Sao tích lũy</div>
+          <div class="progress-bar-wrap">
+            <div class="progress-bar" id="rewardProgressBar" style="width:0%"></div>
+          </div>
+          <div style="font-size:13px;opacity:0.9;font-weight:700" id="rewardProgressText">
+            Hãy học bài để tích thêm sao!
+          </div>
+        </div>
+
+        <!-- Rewards grid -->
+        <h3 style="font-family:var(--font-title);font-size:18px;font-weight:800;margin-bottom:14px">
+          🎁 Bảng phần thưởng
+        </h3>
+        <div class="rewards-grid" id="rewardsGrid"></div>
+
+        <!-- Competition Section -->
+        <div class="leaderboard competition-banner"
+          style="background: linear-gradient(135deg, #FFFDE7 0%, #FFF9C4 100%); border: 2px solid #FBC02D; margin-bottom: 20px;">
+          <h3 style="color: #F57F17;">🔥 ĐUA TOP THÁNG 3/2026 🔥</h3>
+          <p style="font-size: 11px; margin-bottom: 12px; color: #AFB42B; font-weight: 700;">Học chăm mỗi ngày để giành
+            ngôi Vương tháng này nhé!</p>
+          <div id="monthlyLeaderboardList"></div>
+        </div>
+
+        <!-- Badges Section -->
+        <div class="badges-section" style="margin-bottom: 24px;">
+          <h3 style="font-family:var(--font-title);font-size:18px;font-weight:800;margin-bottom:14px">
+            🏅 Huy hiệu danh giá
+          </h3>
+          <div class="badges-grid" id="badgesList"></div>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard">
+          <h3>🏆 Bảng xếp hạng Ngôi sao</h3>
+          <div id="leaderboardList"></div>
+        </div>
+
+        <!-- Note -->
+        <div
+          style="background:var(--purple-light);border-radius:var(--radius-sm);padding:14px;margin-top:16px;font-size:13px;color:var(--purple-dark);font-weight:600;text-align:center">
+          💡 Mỗi ngày check-in học bài = +1 ⭐<br>
+          Tích đủ sao để mở khóa phần thưởng thật từ Bác nhé! 🎉
+        </div>
+
+      </div><!-- /#tab_rewards -->
+
+      <!-- ===========================================
+         TAB: BÁC TÂN (PARENT DASHBOARD)
+         =========================================== -->
+      <div id="tab_parent" class="tab-content">
+        <div class="parent-lock" id="parentLock">
+          <h3>🔑 Khu vực của Bác Tân</h3>
+          <p>Vui lòng nhập mật mã để xem báo cáo (Gợi ý: 1234)</p>
+          <input type="password" id="parentPin" placeholder="Mật mã..." maxlength="4">
+          <button class="btn-checkin" onclick="App.unlockParent()">Mở Khóa</button>
+        </div>
+
+        <div id="parentDashboard" style="display:none">
+          <div class="parent-stats-overview">
+            <div class="stat-box">
+              <div class="stat-val" id="p_totalStars">0</div>
+              <div class="stat-label">Tổng Sao</div>
+            </div>
+            <div class="stat-box">
+              <div class="stat-val" id="p_avgScore">0%</div>
+              <div class="stat-label">Đúng trung bình</div>
+            </div>
+          </div>
+
+          <div class="competition-section">
+            <h3>🏆 Bảng Vàng Thiên Tài (Tháng này)</h3>
+            <p style="font-size:12px; margin-bottom:15px">Xếp hạng dựa trên số sao thực tế kiếm được trong tháng 3/2026.
+            </p>
+            <div id="monthlyLeaderboard" class="monthly-lb">
+              <!-- Render by JS -->
+            </div>
+          </div>
+
+          <div class="stats-deep-section">
+            <h3>📈 Thống kê chuyên sâu</h3>
+            <div class="stats-filter">
+              <button class="filter-btn active" onclick="App.filterStats('month')">Tháng này</button>
+              <button class="filter-btn" onclick="App.filterStats('quarter')">Quý này</button>
+              <button class="filter-btn" onclick="App.filterStats('year')">Cả năm</button>
+            </div>
+            <div id="allStudentsChart" class="progress-charts-container"></div>
+          </div>
+
+          <h3>🎁 Cài đặt phần thưởng thật</h3>
+          <p style="font-size:12px; margin-bottom:10px">Bác hãy đặt ra các món quà thực tế để khích lệ các con nhé!</p>
+          <div id="parentRewardsList" class="p-rewards-list"></div>
+
+          <div class="parent-gift-section"
+            style="margin-top:30px; padding-top:20px; border-top:2px dashed var(--border)">
+            <h3>✨ Tặng Sao Khích Lệ</h3>
+            <p style="font-size:12px; margin-bottom:15px">Bác Tân hãy tặng sao khi các cháu ngoan, giúp đỡ bố mẹ hoặc có
+              biểu hiện tốt nhé!</p>
+            <div class="gift-form">
+              <select id="giftTarget" class="parent-input">
+                <option value="thao">🌸 Phương Thảo</option>
+                <option value="hailinh">🦋 Hải Linh</option>
+                <option value="diep">⭐ Ngọc Diệp</option>
+              </select>
+              <input type="number" id="giftAmount" class="parent-input" placeholder="Số sao tặng..." min="1" max="50">
+              <input type="text" id="giftReason" class="parent-input"
+                placeholder="Lý do tặng (ví dụ: Ngoan, giúp mẹ...)">
+              <button class="btn-checkin" style="width:100%; margin-top:10px" onclick="App.parentGiftStars()">Xác nhận
+                Tặng Sao 🎁</button>
+            </div>
+
+            <div class="gift-suggestions"
+              style="margin-top:20px; background:var(--purple-light); padding:15px; border-radius:15px; font-size:13px; color:var(--purple-dark)">
+              <h4 style="margin-bottom:8px">💡 Gợi ý Kế hoạch Tặng Sao cho Bác Tân:</h4>
+              <ul style="list-style:none; padding-left:0; line-height:1.7">
+                <li>🏠 <strong>Giúp bố mẹ việc nhà:</strong> +2 ⭐</li>
+                <li>📝 <strong>Tự giác học bài (không cần nhắc):</strong> +3 ⭐</li>
+                <li>🏆 <strong>Đạt điểm 9-10 (Hoa điểm 10):</strong> +5 ⭐</li>
+                <li>🤝 <strong>Hành động tốt, giúp đỡ mọi người:</strong> +5 ⭐</li>
+                <li>🍚 <strong>Ăn cơm nhanh, không xem điện thoại:</strong> +1 ⭐</li>
+                <li>⏰ <strong>Dậy sớm và tập thể dục/đi bộ:</strong> +2 ⭐</li>
+              </ul>
+              <p style="margin-top:10px; font-style:italic">❤️ Ghi chú: Khen thưởng đúng lúc sẽ giúp các cháu hào hứng
+                hơn!</p>
+            </div>
+
+            <div class="parent-msg-section"
+              style="margin-top:20px; padding-top:20px; border-top:2px dashed var(--border)">
+              <h3>💌 Gửi Tin Nhắn Bí Mật</h3>
+              <p style="font-size:12px; margin-bottom:15px">Lời khen hoặc dặn dò sẽ hiện ra bất ngờ khi bé vào App!</p>
+              <div class="gift-form">
+                <textarea id="parentMsgContent" class="parent-input"
+                  placeholder="Bác Tân nhắn: Con hôm nay rất ngoan..." rows="2" style="padding:10px"></textarea>
+                <button class="btn-checkin" onclick="App.sendSecretMsg()"
+                  style="margin-top:10px; background:var(--blue)">🚀 Gửi Tin Nhắn</button>
+              </div>
+            </div>
+
+            <div class="system-section" style="margin-top:30px; padding-top:20px; border-top:2px solid var(--border)">
+              <h3>💾 Hệ Thống & Sao Lưu</h3>
+              <div class="backup-restore-group" style="display:flex; gap:10px; margin-top:15px">
+                <button class="btn-checkin" onclick="State.exportData()" style="flex:1; background:var(--green)">📥 Sao
+                  Lưu (Backup)</button>
+                <button class="btn-checkin" onclick="document.getElementById('importFile').click()"
+                  style="flex:1; background:var(--orange)">📤 Khôi Phục (Restore)</button>
+                <input type="file" id="importFile" style="display:none" accept=".json"
+                  onchange="App.handleImport(event)">
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===========================================
+           TAB: THỬ THÁCH
+           =========================================== -->
+      <div id="tab_challenge" class="tab-content">
+        <div class="challenge-hero">
+          <div class="challenge-icon pulse">⚡</div>
+          <h2>Đại Chiến Sấm Sét</h2>
+          <p>Giải toán nhanh trong 60 giây để nhận huy hiệu sấm sét và sao thưởng!</p>
+        </div>
+
+        <div id="gameStartArea" class="game-card glass">
+          <div class="game-best">Kỷ lục của em: <span id="gameBestScore">0</span> điểm</div>
+          <button class="btn-checkin" style="background:var(--yellow); color:var(--text); font-size:20px"
+            onclick="Game.start()">BẮT ĐẦU CHIẾN 🚀</button>
+        </div>
+
+        <div id="gamePlayArea" class="game-card glass hidden">
+          <div class="game-header">
+            <div class="game-timer">⏳ <span id="gameTimer">60</span>s</div>
+            <div class="game-score">✨ <span id="gameScore">0</span></div>
+          </div>
+          <div class="game-problem" id="gameProblem">? + ? = ?</div>
+          <div class="game-input-area">
+            <input type="number" id="gameInput" class="game-input" placeholder="?" inputmode="numeric">
+            <button class="btn-checkin" style="margin-top:20px" onclick="Game.check()">Gửi Đáp Án</button>
+          </div>
+        </div>
+
+        <div id="gameResultArea" class="game-card glass hidden">
+          <div class="result-emoji">🎉</div>
+          <h3 id="resultTitle">Hết giờ!</h3>
+          <div class="result-stats">
+            Số câu đúng: <strong id="resultScore">0</strong><br>
+            Sao nhận được: <strong id="resultStars">0</strong> ⭐
+          </div>
+          <button class="btn-checkin" onclick="Game.reset()">Chơi lại</button>
+        </div>
+      </div>
+
+    </div><!-- /#studentScreen -->
+
+  </div><!-- /.app-wrapper -->
+
+  <!-- ====================================================
+     PRAISE POPUP
+     ==================================================== -->
+  <div class="praise-overlay hidden" id="praiseOverlay">
+    <div class="praise-card">
+      <span class="praise-emoji" id="praiseEmoji">🌟</span>
+      <div class="praise-title" id="praiseTitle">Giỏi lắm!</div>
+      <div class="praise-text" id="praiseText">Em thật chăm chỉ!</div>
+      <div class="praise-stars" id="praiseStarsTotal">Tổng: 1 ⭐</div>
+      <button class="btn-praise-close" id="btnPraiseClose">
+        🎉 Cảm ơn Bác!
+      </button>
+    </div>
+  </div>
+
+  <!-- Confetti container -->
+  <div class="confetti-container" id="confettiContainer"></div>
+
+  <!-- Scripts -->
+  <script src="data.js"></script>
+  <script src="app.js"></script>
+
+</body>
+
+</html>
