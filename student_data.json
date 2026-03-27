@@ -1,0 +1,44 @@
+{
+  "thao": {
+    "stars": 0,
+    "checkins": {},
+    "hwDone": {},
+    "bonusRewarded": {},
+    "hwBonusAwarded": {},
+    "unlockedRewards": [],
+    "inventory": [],
+    "messages": [],
+    "petExp": 0,
+    "badges": [],
+    "bonusAnswers": {},
+    "bonusScores": {}
+  },
+  "hailinh": {
+    "stars": 0,
+    "checkins": {},
+    "hwDone": {},
+    "bonusRewarded": {},
+    "hwBonusAwarded": {},
+    "unlockedRewards": [],
+    "inventory": [],
+    "messages": [],
+    "petExp": 0,
+    "badges": [],
+    "bonusAnswers": {},
+    "bonusScores": {}
+  },
+  "diep": {
+    "stars": 0,
+    "checkins": {},
+    "hwDone": {},
+    "bonusRewarded": {},
+    "hwBonusAwarded": {},
+    "unlockedRewards": [],
+    "inventory": [],
+    "messages": [],
+    "petExp": 0,
+    "badges": [],
+    "bonusAnswers": {},
+    "bonusScores": {}
+  }
+}
