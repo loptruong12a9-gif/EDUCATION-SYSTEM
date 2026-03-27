@@ -3,7 +3,7 @@
 // HỌC VUI CÙNG BÉ - Nâng cấp bởi Bác Tân
 // ============================================================
 
-const APP_VERSION = "3.0.0";
+const APP_VERSION = "3.0";
 
 // ============================================================
 // CẤU HÌNH CHUNG
@@ -128,7 +128,10 @@ const THAO_DATA = {
             { question: "Đặt câu kiểu 'Ai thế nào?' tả về con mèo.", hint: "Con mèo rất...", answer: "Con mèo nhà em rất lười biếng." },
             { question: "Tìm từ chỉ sự vật trong câu: 'Đàn cò trắng đang bay lượn.'", hint: "Con gì?", answer: "Đàn cò / Cò." },
             { question: "Câu 'Em là học sinh lớp 2' thuộc kiểu câu gì?", hint: "Ai là gì?", answer: "Kiểu câu Ai là gì?" },
-            { question: "Tìm từ chỉ đặc điểm của quả xoài chín.", hint: "Màu gì? Vị thế nào?", answer: "Vàng, ngọt" }
+            { question: "Tìm từ chỉ đặc điểm của quả xoài chín.", hint: "Màu gì? Vị thế nào?", answer: "Vàng, ngọt" },
+            { question: "Tìm 2 từ chỉ đặc điểm của biển cả.", hint: "Rộng lớn, xanh ngắt...", answer: "Rộng lớn, xanh ngắt, mênh mông." },
+            { question: "Đặt câu hỏi cho bộ phận in đậm: 'Lớp em **đang học bài**'.", hint: "Lớp em làm gì?", answer: "Lớp em đang làm gì?" },
+            { question: "Tìm từ cùng nghĩa với 'chăm chỉ'.", hint: "Siêng năng, ...", answer: "Siêng năng, cần cù." }
         ],
         "toan": [
             { question: "Tính: 36 + 24 = ?", hint: "Cẩn thận phép cộng có nhớ", answer: "60" },
@@ -148,7 +151,11 @@ const THAO_DATA = {
             { question: "Số nhỏ nhất có 2 chữ số giống nhau là?", hint: "11, 22...", answer: "11" },
             { question: "Tính: 5 x 8 = ?", hint: "Bảng nhân 5", answer: "40" },
             { question: "Tìm x: x + 25 = 100", hint: "x = 100 - 25", answer: "75" },
-            { question: "Hình có 3 cạnh và 3 đỉnh là hình gì?", hint: "Hình...", answer: "Hình tam giác" }
+            { question: "Hình có 3 cạnh và 3 đỉnh là hình gì?", hint: "Hình...", answer: "Hình tam giác" },
+            { question: "Tính: 134 + 56 = ?", hint: "Cộng hàng đơn vị, chục, trăm", answer: "190" },
+            { question: "Tính: 200 - 125 = ?", hint: "Trừ có nhớ", answer: "75" },
+            { question: "Một sợi dây dài 2m, cắt đi 15dm. Hỏi còn lại bao nhiêu đề-xi-mét?", hint: "2m = 20dm", answer: "5dm" },
+            { question: "Tính nhanh: 5 x 7 + 15 = ?", hint: "35 + 15", answer: "50" }
         ],
         "tnxh": [
             { question: "Kể tên các thành viên trong gia đình em.", hint: "Ông, bà, bố, mẹ...", answer: "Bé tự kể tên người thân." },
@@ -282,7 +289,10 @@ const HAILINH_DATA = {
             { question: "Tìm từ chỉ đặc điểm của mái tóc bà: 'Mái tóc bà bạc trắng như cước.'", hint: "Màu sắc thế nào?", answer: "bạc trắng." },
             { question: "Đặt câu hỏi 'Ai là gì?' để giới thiệu về bố em.", hint: "Bố em là...", answer: "Bố em là một người thợ mộc." },
             { question: "Sử dụng biện pháp nhân hóa để tả đám mây.", hint: "Đám mây đang làm gì như con người?", answer: "Ví dụ: Những đám mây trắng nhẩn nhơ dạo chơi trên bầu trời." },
-            { question: "Tìm 3 tính từ tả bầu trời buổi sáng.", hint: "Trong xanh, ...", answer: "Trong xanh, cao vời vợi, ửng hồng." }
+            { question: "Tìm 3 tính từ tả bầu trời buổi sáng.", hint: "Trong xanh, ...", answer: "Trong xanh, cao vời vợi, ửng hồng." },
+            { question: "Xác định chủ ngữ trong câu: 'Mùa xuân đã về trên quê hương em.'", hint: "Cái gì đã về?", answer: "Mùa xuân." },
+            { question: "Tìm từ trái nghĩa với 'dũng cảm'.", hint: "Nghịch với anh hùng", answer: "Hèn nhát / Nhát gan." },
+            { question: "Điền từ so sánh: 'Mắt mèo tròn ... hai hòn bi xanh.'", hint: "Như, giống như...", answer: "như / giống như." }
         ],
         "toan": [
             { question: "7 x 8 = ?", hint: "Bảng nhân 7", answer: "56" },
@@ -302,7 +312,12 @@ const HAILINH_DATA = {
             { question: "Trong phép chia 45 : 5 = 9, số 45 gọi là gì?", hint: "Số bị chia, số chia hay thương?", answer: "Số bị chia" },
             { question: "Số 10.000 đọc là gì?", hint: "Mười ...", answer: "Mười nghìn" },
             { question: "Có 24 cái kẹo chia đều cho 3 bạn. Mỗi bạn được mấy cái?", hint: "24 : 3", answer: "8 cái" },
-            { question: "Số nhỏ nhất có 5 chữ số là số nào?", hint: "1 và bốn số 0", answer: "10000" }
+            { question: "Số nhỏ nhất có 5 chữ số là số nào?", hint: "1 và bốn số 0", answer: "10000" },
+            { question: "Tính: 1234 + 5678 = ?", hint: "Cộng không nhớ và có nhớ", answer: "6912" },
+            { question: "Tính: 10000 - 999 = ?", hint: "Cẩn thận hàng đơn vị", answer: "9001" },
+            { question: "Tính: 24 x 5 = ?", hint: "Nhân hàng đơn vị trước", answer: "120" },
+            { question: "Tính: 81 : 9 + 45 = ?", hint: "Chia trước cộng sau", answer: "54" },
+            { question: "Một hình chữ nhật có chu vi 20cm, chiều dài 6cm. Chiều rộng là bao nhiêu?", hint: "Rộng = (Chu vi : 2) - Dài", answer: "4cm" }
         ],
         "tnxh": [
             { question: "Cơ quan nào giúp cơ thể tiêu hóa thức ăn?", hint: "Dạ dày, ruột...", answer: "Cơ quan tiêu hóa." },

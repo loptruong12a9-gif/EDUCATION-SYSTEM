@@ -17,19 +17,131 @@ const State = {
 
     load() {
         const saved = localStorage.getItem('hocVuiData');
+        const defaultStudent = { 
+            stars: 0, checkins: {}, hwDone: {}, bonusRewarded: {}, 
+            hwBonusAwarded: {}, unlockedRewards: [], inventory: [], 
+            messages: [], petExp: 0, badges: [], 
+            bonusAnswers: {}, bonusScores: {} 
+        };
+
         if (saved) {
-            this.data = JSON.parse(saved);
+            try {
+                this.data = JSON.parse(saved);
+                // Đảm bảo đủ các trường dữ liệu cho từng bé
+                ['thao', 'hailinh', 'diep'].forEach(k => {
+                    if (!this.data[k]) this.data[k] = { ...defaultStudent };
+                    else this.data[k] = { ...defaultStudent, ...this.data[k] };
+                });
+            } catch (e) {
+                console.error("Lỗi khi tải dữ liệu từ localStorage:", e);
+                this.data = { thao: { ...defaultStudent }, hailinh: { ...defaultStudent }, diep: { ...defaultStudent } };
+            }
         } else {
             this.data = {
-                thao: { stars: 0, checkins: {}, hwDone: {}, unlockedRewards: [], inventory: [], messages: [], petExp: 0, badges: [] },
-                hailinh: { stars: 0, checkins: {}, hwDone: {}, unlockedRewards: [], inventory: [], messages: [], petExp: 0, badges: [] },
-                diep: { stars: 0, checkins: {}, hwDone: {}, unlockedRewards: [], inventory: [], messages: [], petExp: 0, badges: [] },
+                thao: { ...defaultStudent },
+                hailinh: { ...defaultStudent },
+                diep: { ...defaultStudent },
             };
+        }
+
+        // Tự động điền cấu hình GitHub nếu chưa có
+        if (!localStorage.getItem('gitSyncConfig')) {
+            const defaultConfig = {
+                token: "",
+                repo: "",
+                branch: "main",
+                autoSync: true
+            };
+            localStorage.setItem('gitSyncConfig', JSON.stringify(defaultConfig));
         }
     },
 
     save() {
         localStorage.setItem('hocVuiData', JSON.stringify(this.data));
+        // Tự động đồng bộ nếu có cấu hình
+        this.autoSync();
+    },
+
+    async autoSync() {
+        const config = JSON.parse(localStorage.getItem('gitSyncConfig') || '{}');
+        if (config.token && config.repo && config.autoSync !== false) {
+            try {
+                await this.syncToGithub(config);
+                console.log("✅ Đã tự động đồng bộ lên GitHub thành công!");
+            } catch (e) {
+                console.warn("⚠️ Tự động đồng bộ GitHub thất bại:", e);
+            }
+        }
+    },
+
+    async syncToGithub(config) {
+        if (!config.token || !config.repo) return;
+        const filePath = 'student_data.json';
+        const url = `https://api.github.com/repos/${config.repo}/contents/${filePath}`;
+        const content = btoa(unescape(encodeURIComponent(JSON.stringify(this.data, null, 2))));
+
+        // Lấy SHA của tệp hiện tại để cập nhật
+        let sha = '';
+        try {
+            const res = await fetch(url, {
+                headers: { 'Authorization': `token ${config.token}` }
+            });
+            if (res.ok) {
+                const fileData = await res.json();
+                sha = fileData.sha;
+            }
+        } catch (e) {}
+
+        const body = {
+            message: `Auto-sync: Cập nhật tiến độ học tập - ${new Date().toLocaleString()}`,
+            content: content,
+            sha: sha,
+            branch: config.branch || 'main'
+        };
+
+        const response = await fetch(url, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `token ${config.token}`,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(body)
+        });
+
+        if (!response.ok) {
+            throw new Error(`GitHub Sync Error: ${response.statusText}`);
+        }
+        return await response.json();
+    },
+
+    async loadFromGithub() {
+        const config = JSON.parse(localStorage.getItem('gitSyncConfig') || '{}');
+        if (!config.token || !config.repo) {
+            alert("⚠️ Bác chưa cấu hình đồng bộ GitHub nhé!");
+            return;
+        }
+
+        try {
+            const filePath = 'student_data.json';
+            const url = `https://api.github.com/repos/${config.repo}/contents/${filePath}?ref=${config.branch || 'main'}`;
+            const res = await fetch(url, {
+                headers: { 'Authorization': `token ${config.token}` }
+            });
+
+            if (res.ok) {
+                const fileData = await res.json();
+                const decoded = decodeURIComponent(escape(atob(fileData.content)));
+                this.data = JSON.parse(decoded);
+                this.save();
+                alert("✅ Đã tải dữ liệu mới nhất từ GitHub thành công!");
+                location.reload();
+            } else {
+                alert("❌ Không tìm thấy tệp dữ liệu trên GitHub.");
+            }
+        } catch (e) {
+            console.error(e);
+            alert("❌ Lỗi khi tải dữ liệu từ GitHub: " + e.message);
+        }
     },
 
     getStudentData(who) {
@@ -42,6 +154,8 @@ const State = {
         if (!d.badges) d.badges = [];
         if (d.petExp === undefined) d.petExp = 0;
         if (!d.inventory) d.inventory = [];
+        if (!d.bonusRewarded) d.bonusRewarded = {};
+        if (!d.hwBonusAwarded) d.hwBonusAwarded = {};
 
         return d;
     },
@@ -489,9 +603,10 @@ const ContentGen = {
         const bonus = sData.bonusExercises;
         const dow = Utils.getDayOfWeek(year, month, day);
         const dateStr = Utils.toDateStr(year, month, day);
-        const allPossible = [];
+        const mathPool = [];
+        const othersPool = [];
 
-        // Chọn môn học theo ngày
+        // Chọn môn học theo ngày cho phần "khác"
         const dayMap = {
             1: ['tiengviet', 'toan'],
             2: ['toan', (studentKey === 'thao' || studentKey === 'hailinh') ? 'tnxh' : 'khoahoc'],
@@ -499,16 +614,29 @@ const ContentGen = {
             4: ['english', 'toan'],
             5: [(studentKey === 'thao' || studentKey === 'hailinh') ? 'tnxh' : 'lsdia', 'tiengviet'],
         };
-
         const subjects = dayMap[dow] || ['toan', 'tiengviet'];
 
-        subjects.forEach(sub => {
-            if (bonus[sub]) {
-                bonus[sub].forEach((ex, idx) => {
-                    allPossible.push({ ...ex, subject: sub, originalIdx: idx });
+        try {
+            if (bonus && bonus.toan) {
+                bonus.toan.forEach((ex, idx) => {
+                    if (ex && ex.question) {
+                        mathPool.push({ ...ex, subject: 'toan', originalIdx: idx });
+                    }
                 });
             }
-        });
+            
+            subjects.forEach(sub => {
+                if (sub !== 'toan' && bonus && bonus[sub]) {
+                    bonus[sub].forEach((ex, idx) => {
+                        if (ex && ex.question) {
+                            othersPool.push({ ...ex, subject: sub, originalIdx: idx });
+                        }
+                    });
+                }
+            });
+        } catch (e) {
+            console.error("Error pooling exercises:", e);
+        }
 
         // Sử dụng một hàm băm đơn giản từ dateStr để chọn bài tập cố định cho ngày đó
         const seed = dateStr.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
@@ -517,13 +645,31 @@ const ContentGen = {
             return x - Math.floor(x);
         };
 
-        // Trộn và lấy 15 bài cố định cho ngày
         const result = [];
-        const pool = [...allPossible];
-        for (let i = 0; i < 15 && pool.length > 0; i++) {
+        
+        // 1. Lấy khoảng 70% là Toán (14 câu trên 20)
+        const mathTarget = 14;
+        for (let i = 0; i < mathTarget && mathPool.length > 0; i++) {
             const r = seededRandom(seed + i);
-            const idx = Math.floor(r * pool.length);
-            result.push(pool.splice(idx, 1)[0]);
+            const idx = Math.floor(r * mathPool.length);
+            result.push(mathPool.splice(idx, 1)[0]);
+        }
+
+        // 2. Lấy phần còn lại từ các môn khác (6 câu)
+        const othersTarget = 6;
+        for (let i = 0; i < othersTarget && othersPool.length > 0; i++) {
+            const r = seededRandom(seed + 100 + i);
+            const idx = Math.floor(r * othersPool.length);
+            result.push(othersPool.splice(idx, 1)[0]);
+        }
+
+        // 3. Nếu vẫn thiếu (do pool nhỏ), lấy thêm từ pool khác nếu còn
+        const finalTarget = 20;
+        const combinedPool = [...mathPool, ...othersPool];
+        for (let i = result.length; i < finalTarget && combinedPool.length > 0; i++) {
+            const r = seededRandom(seed + 200 + i);
+            const idx = Math.floor(r * combinedPool.length);
+            result.push(combinedPool.splice(idx, 1)[0]);
         }
 
         return result;
@@ -575,10 +721,10 @@ const UI = {
         document.getElementById('studentGrade').textContent = `Lớp ${sd.grade} - Năm học 2025-2026`;
         document.getElementById('topbarEmoji').textContent = sd.emoji;
 
-        // Reset Parent tab if switching
-        document.getElementById('parentDashboard').style.display = 'none';
+        // Reset Parent lock if switching
         document.getElementById('parentLock').style.display = 'block';
-        document.getElementById('parentPin').value = '';
+        document.getElementById('parentDashboard').style.display = 'none';
+        if (App && App.clearPin) App.clearPin();
 
         this.updateTopbarStars();
         this.renderToday();
@@ -602,6 +748,7 @@ const UI = {
         const dateStr = Utils.toDateStr(year, month, day);
         const dow = Utils.getDayOfWeek(year, month, day);
         const studentKey = State.currentStudent;
+        if (!studentKey) return;
         const isToday = (year === t.year && month === t.month && day === t.day);
 
         // Date display
@@ -613,10 +760,9 @@ const UI = {
         document.getElementById('themeContent').textContent = theme;
 
         const quote = Utils.randomPick(window.APP_DATA.QUOTES) || 'Cố gắng mỗi ngày nhé!';
-        const sd = State.getStudentData(studentKey) || {};
-        const studentDisplayName = sd.shortName || (sd.name ? sd.name.split(' ').pop() : 'Bé');
-        const personalizedQuote = quote.replace(/{name}/g, studentDisplayName);
-        document.getElementById('quoteText').textContent = personalizedQuote;
+        const sDataRef = window.APP_DATA[studentKey.toUpperCase()];
+        const studentDisplayName = (sDataRef && sDataRef.shortName) ? sDataRef.shortName : 'Bé';
+        document.getElementById('quoteText').textContent = quote.replace(/{name}/g, studentDisplayName);
 
         this.renderTrivia();
         this.renderSecretMessages();
@@ -732,52 +878,48 @@ const UI = {
         </div>`;
         }
 
-        bonusExercises.forEach((ex, idx) => {
-            const savedAns = State.getBonusAnswer(studentKey, dateStr, idx);
-            bonusContainer.innerHTML += `
-        <div class="bonus-item">
-          <div class="bonus-qnum">${idx + 1}</div>
-          <div class="bonus-question">${ex.question}</div>
-          ${ex.image ? `<img src="${ex.image}" class="bonus-image" alt="minh họa">` : ''}
-          ${ex.hint ? `<div class="bonus-hint">💡 Gợi ý: ${ex.hint}</div>` : ''}
-          
-          <div class="bonus-input-group">
-            <input type="text" class="bonus-input" id="input_bonus_${idx}" 
-                   placeholder="Nhập câu trả lời..." value="${savedAns || ''}"
-                   oninput="App.saveBonusAnswer('${dateStr}', ${idx}, this.value)">
-            <button class="btn-voice" onclick="App.startVoice('input_bonus_${idx}', '${dateStr}', ${idx})" title="Nói câu trả lời">🎤</button>
-            <button class="btn-check-bonus" onclick="App.checkBonus(${idx}, '${ex.answer.replace(/'/g, "\\'")}', '${dateStr}', '${ex.subject}')">Kiểm tra</button>
-          </div>
-          <div class="bonus-result" id="res_bonus_${idx}"></div>
-
-          <button class="btn-show-answer" id="btn_show_ans_${idx}" 
-                  style="margin-top:12px; display: ${savedAns ? 'inline-block' : 'none'}" 
-                  onclick="this.style.display='none'; document.getElementById('ans_${idx}').classList.add('visible')">
-            👁️ Xem đáp án gợi ý
-          </button>
-          <div class="bonus-answer" id="ans_${idx}">✅ Đáp án gợi ý: ${ex.answer}</div>
-        </div>`;
-        });
-
-        if (bonusExercises.length === 0) {
-            bonusContainer.innerHTML = `<div class="empty-state"><div class="empty-emoji">🧩</div><p>Hôm nay không có bài tập bổ sung!</p></div>`;
+        if (!bonusExercises || bonusExercises.length === 0) {
+            bonusContainer.innerHTML += `<div class="empty-state"><div class="empty-emoji">🧩</div><p>Hôm nay chưa có bài tập bổ sung!</p></div>`;
+        } else {
+            bonusExercises.forEach((ex, idx) => {
+                if (!ex || !ex.question) return;
+                const savedAns = State.getBonusAnswer(studentKey, dateStr, idx);
+                const safeAnswer = (ex.answer || '').toString().replace(/'/g, "\\'")
+                bonusContainer.innerHTML += `
+            <div class="bonus-item">
+              <div class="bonus-qnum">${idx + 1}</div>
+              <div class="bonus-question">${ex.question}</div>
+              ${ex.image ? `<img src="${ex.image}" class="bonus-image" alt="minh họa">` : ''}
+              ${ex.hint ? `<div class="bonus-hint">💡 Gợi ý: ${ex.hint}</div>` : ''}
+              <div class="bonus-input-group">
+                <input type="text" class="bonus-input" id="input_bonus_${idx}"
+                       placeholder="Nhập câu trả lời..." value="${savedAns || ''}"
+                       oninput="App.saveBonusAnswer('${dateStr}', ${idx}, this.value)">
+                <button class="btn-voice" onclick="App.startVoice('input_bonus_${idx}', '${dateStr}', ${idx})" title="Nói câu trả lời">🎤</button>
+                <button class="btn-check-bonus" onclick="App.checkBonus(${idx}, '${safeAnswer}', '${dateStr}', '${ex.subject}')">Kiểm tra</button>
+              </div>
+              <div class="bonus-result" id="res_bonus_${idx}"></div>
+              <button class="btn-show-answer" id="btn_show_ans_${idx}"
+                      style="margin-top:12px; display:${savedAns ? 'inline-block' : 'none'}"
+                      onclick="this.style.display='none'; document.getElementById('ans_${idx}').classList.add('visible')">
+                👁️ Xem đáp án gợi ý
+              </button>
+              <div class="bonus-answer" id="ans_${idx}">✅ Đáp án gợi ý: ${ex.answer}</div>
+            </div>`;
+            });
         }
 
 
-        // 4. Check-in button
+        // 4. Nút check-in
         const checkedIn = State.isCheckedIn(studentKey, dateStr);
         const btnCheckin = document.getElementById('btnCheckin');
-        if (checkedIn) {
-            btnCheckin.innerHTML = '✅ Em đã học xong hôm nay! +⭐';
-            btnCheckin.classList.add('done');
-            // Không set disabled để nút vẫn "ấn được" và hiện mini praise
-        } else {
-            btnCheckin.innerHTML = '✅ Em đã học xong hôm nay!';
-            btnCheckin.classList.remove('done');
+        if (btnCheckin) {
+            btnCheckin.innerHTML = checkedIn ? '✅ Em đã học xong hôm nay! +⭐' : '✅ Em đã học xong hôm nay!';
+            btnCheckin.classList.toggle('done', checkedIn);
+            btnCheckin.dataset.date = dateStr;
         }
-        btnCheckin.dataset.date = dateStr;
 
-        // 5. Parent summary
+        // 5. Bảng tóm tắt
         this.renderParentSummary(year, month, day);
     },
 
@@ -1138,68 +1280,6 @@ const UI = {
         });
     },
 
-    // --- RELAX TAB ---
-    renderRelax() {
-        const audio = window.APP_DATA.AUDIO_LIBRARY;
-        const mList = document.getElementById('musicList');
-        const sList = document.getElementById('storyList');
-
-        if (mList) {
-            mList.innerHTML = '';
-            audio.music.forEach(m => {
-                let icon = '🎵';
-                if (m.id.includes('lofi')) icon = '🎧';
-                if (m.id.includes('piano')) icon = '🎹';
-                if (m.id.includes('nature')) icon = '🌿';
-                if (m.id.includes('classic')) icon = '🎻';
-
-                mList.innerHTML += `
-                    <div class="audio-card" data-url="${m.url}" onclick="App.playAudio('${m.url}', '${m.name}', '${icon}')">
-                        <div class="audio-card-main">
-                            <span class="play-icon">${icon}</span>
-                            <div class="audio-info">
-                                <div class="audio-name">${m.name}</div>
-                                <div class="audio-desc">${m.desc}</div>
-                            </div>
-                            <span class="btn-play-mini">▶️</span>
-                        </div>
-                        <div class="card-controls-inner">
-                            <span style="font-size:12px">🔈</span>
-                            <input type="range" class="card-vol-slider" min="0" max="1" step="0.05" value="0.35" 
-                                   onclick="event.stopPropagation()" 
-                                   oninput="App.changeVolume(this.value)">
-                            <button class="btn-stop-mini" onclick="event.stopPropagation(); App.stopAudio()">Dừng</button>
-                        </div>
-                        <div class="playing-wave"></div>
-                    </div>`;
-            });
-        }
-
-        if (sList) {
-            sList.innerHTML = '';
-            audio.stories.forEach(s => {
-                sList.innerHTML += `
-                    <div class="audio-card" data-url="${s.url}" onclick="App.playAudio('${s.url}', '${s.name}', '📖')">
-                        <div class="audio-card-main">
-                            <span class="play-icon">📖</span>
-                            <div class="audio-info">
-                                <div class="audio-name">${s.name}</div>
-                                <div class="audio-desc">${s.desc}</div>
-                            </div>
-                            <span class="btn-play-mini">🎧</span>
-                        </div>
-                        <div class="card-controls-inner">
-                            <span style="font-size:12px">🔈</span>
-                            <input type="range" class="card-vol-slider" min="0" max="1" step="0.05" value="0.35" 
-                                   onclick="event.stopPropagation()" 
-                                   oninput="App.changeVolume(this.value)">
-                            <button class="btn-stop-mini" onclick="event.stopPropagation(); App.stopAudio()">Dừng</button>
-                        </div>
-                        <div class="playing-wave"></div>
-                    </div>`;
-            });
-        }
-    },
 
     // --- PARENT DASHBOARD ---
     renderParentDashboard(filter = 'month') {
@@ -1397,18 +1477,6 @@ const App = {
         UI.renderHome();
     },
 
-    enterParentFromHome() {
-        console.log("⚓ Đang mở Bảng Điều Khiển của Bác...");
-        // Vào đại diện qua bé Thảo để tới tab Quản lý
-        App.enterStudent('thao', 'parent');
-
-        // Tự động mở khóa luôn cho Bác Tân khi vào từ Home
-        setTimeout(() => {
-            document.getElementById('parentPin').value = '1234';
-            App.unlockParent();
-        }, 100);
-    },
-
     switchTab(tabName) {
         State.currentTab = tabName;
 
@@ -1438,8 +1506,6 @@ const App = {
             UI.renderLeaderboard();
         } else if (tabName === 'shop') {
             UI.renderShop();
-        } else if (tabName === 'relax') {
-            UI.renderRelax();
         } else if (tabName === 'challenge') {
             Game.init(State.currentStudent);
         } else if (tabName === 'parent') {
@@ -1447,14 +1513,41 @@ const App = {
         }
     },
 
+    inputPin(num) {
+        if (!this.tempPin) this.tempPin = "";
+        if (this.tempPin.length < 4) {
+            this.tempPin += num;
+            this.updatePinDisplay();
+            if (this.tempPin.length === 4) {
+               // Chờ một chút rồi tự động unlock
+               setTimeout(() => this.unlockParent(), 300);
+            }
+        }
+    },
+
+    clearPin() {
+        this.tempPin = "";
+        this.updatePinDisplay();
+    },
+
+    updatePinDisplay() {
+        const dots = document.querySelectorAll('.pin-dot');
+        dots.forEach((dot, i) => {
+            if (i < this.tempPin.length) dot.classList.add('active');
+            else dot.classList.remove('active');
+        });
+    },
+
     unlockParent() {
-        const pin = document.getElementById('parentPin').value;
-        if (pin === '1234') {
+        if (this.tempPin === '1234') {
+            this.tempPin = "";
             document.getElementById('parentLock').style.display = 'none';
             document.getElementById('parentDashboard').style.display = 'block';
             UI.renderParentDashboard();
+            this.initGitSyncFields();
         } else {
             alert('❌ Mật mã chưa đúng Bác Tân ơi!');
+            this.clearPin();
         }
     },
 
@@ -1490,6 +1583,31 @@ const App = {
         }
     },
 
+    initGitSyncFields() {
+        const config = JSON.parse(localStorage.getItem('gitSyncConfig') || '{}');
+        const t = document.getElementById('gitToken');
+        const r = document.getElementById('gitRepo');
+        if (t && config.token) t.value = config.token;
+        if (r && config.repo) r.value = config.repo;
+    },
+
+    saveGitSyncConfig() {
+        const token = document.getElementById('gitToken').value.trim();
+        const repo = document.getElementById('gitRepo').value.trim();
+        if (!token || !repo) return alert("Bác hãy nhập đủ Token và Repo nhé!");
+
+        const config = {
+            token: token,
+            repo: repo,
+            branch: 'main',
+            autoSync: true
+        };
+        localStorage.setItem('gitSyncConfig', JSON.stringify(config));
+        alert("✅ Đã lưu cấu hình đồng bộ GitHub!");
+        // Thử đồng bộ ngay lập tức
+        State.autoSync();
+    },
+
     sendSecretMsg() {
         const target = document.getElementById('giftTarget').value;
         const msg = document.getElementById('parentMsgContent').value.trim();
@@ -1521,53 +1639,6 @@ const App = {
         }
     },
 
-    playAudio(url, name, icon) {
-        if (url === '#') {
-            alert('🎬 Tính năng truyện kể đang được cập nhật thêm nội dung nhé!');
-            return;
-        }
-        const container = document.getElementById('audioPlayerContainer');
-        const player = document.getElementById('mainAudioPlayer');
-        const iconEl = document.getElementById('nowPlayingIcon');
-        const nameEl = document.getElementById('nowPlayingName');
-
-        // Remove active class from all cards
-        document.querySelectorAll('.audio-card').forEach(card => card.classList.remove('active'));
-        // Add active class to clicked card
-        const activeCard = document.querySelector(`.audio-card[data-url="${url}"]`);
-        if (activeCard) activeCard.classList.add('active');
-
-        iconEl.textContent = icon;
-        nameEl.textContent = name;
-        player.src = url;
-        player.volume = 0.35; // Âm lượng vừa đủ (35%)
-        container.style.display = 'none'; // Ẩn trình phát dưới cùng để dùng trình phát tại thẻ
-
-        // Sync card slider UI if exists
-        if (activeCard) {
-            const cardSlider = activeCard.querySelector('.card-vol-slider');
-            if (cardSlider) cardSlider.value = 0.35;
-        }
-
-        player.play();
-    },
-
-    changeVolume(val) {
-        const player = document.getElementById('mainAudioPlayer');
-        if (player) {
-            player.volume = val;
-        }
-        // Sync secondary slider if using fixed player
-        const mainSlider = document.getElementById('volumeSlider');
-        if (mainSlider) mainSlider.value = val;
-    },
-
-    stopAudio() {
-        const player = document.getElementById('mainAudioPlayer');
-        player.pause();
-        player.src = '';
-        document.querySelectorAll('.audio-card').forEach(card => card.classList.remove('active'));
-    },
 
     startVoice(inputId, dateStr, idx) {
         const input = document.getElementById(inputId);
@@ -1671,8 +1742,11 @@ const App = {
         if (done) {
             const hwItems = document.querySelectorAll('.hw-check');
             const allDone = Array.from(hwItems).every(el => el.classList.contains('done'));
-            if (allDone && hwItems.length > 0) {
+            const sData = State.getStudentData(studentKey);
+            if (allDone && hwItems.length > 0 && !sData.hwBonusAwarded[dateStr]) {
                 setTimeout(() => {
+                    sData.hwBonusAwarded[dateStr] = true;
+                    State.save();
                     const newStars = State.addStar(studentKey, 2);
                     UI.updateTopbarStars();
                     this.showMiniPraise('🎉 Tuyệt vời! Hoàn thành hết bài về nhà: +2 ⭐');
@@ -1726,10 +1800,18 @@ const App = {
         });
 
         State.saveBonusScore(studentKey, dateStr, correctCount, dailyExercises.length);
-        if (isCorrect) {
+        
+        const sData = State.getStudentData(studentKey);
+        if (!sData.bonusRewarded[dateStr]) sData.bonusRewarded[dateStr] = [];
+        
+        if (isCorrect && !sData.bonusRewarded[dateStr].includes(idx)) {
+            sData.bonusRewarded[dateStr].push(idx);
+            State.save();
             State.addStar(studentKey, 1);
             UI.updateTopbarStars();
             this.showMiniPraise('✨ Chính xác! Tặng em +1 ⭐');
+        } else if (isCorrect) {
+            this.showMiniPraise('🌟 Em đã nhận sao cho câu này rồi nhé!');
         }
     },
 

@@ -97,13 +97,7 @@
 
       <div class="home-footer">
         <p>👆 Nhấn vào tên để vào trang học của em</p>
-        <p style="margin-top:6px; font-weight: 800; letter-spacing: 1px;">PHÁT TRIỂN BỞI TÂN NGUYỄN - CẬP NHẬT PHIÊN BẢN
-          MỚI NHẤT V3.0</p>
-        <div class="footer-center" style="display:flex; justify-content:center; width:100%; margin-top:10px;">
-          <button class="btn-parent-shortcut" onclick="App.enterParentFromHome()">
-            ⚓ Bác Tân (Bác Quản Lý)
-          </button>
-        </div>
+        <p class="footer-version">v3.0 • Tân Nguyễn</p>
       </div>
 
     </div><!-- /#homeScreen -->
@@ -202,7 +196,6 @@
         <button class="tab-btn active" data-tab="today" role="tab">📅 Hôm Nay</button>
         <button class="tab-btn" data-tab="calendar" role="tab">🗓️ Lịch Tháng</button>
         <button class="tab-btn" data-tab="shop" role="tab">🛒 Cửa Hàng</button>
-        <button class="tab-btn" data-tab="relax" role="tab">🎧 Giải Trí</button>
         <button class="tab-btn" data-tab="challenge" role="tab">⚡ Thử Thách</button>
         <button class="tab-btn" data-tab="rewards" role="tab">⭐ Phần Thưởng</button>
         <button class="tab-btn btn-parent-tab" data-tab="parent" role="tab">⚙️ Quản Lý</button>
@@ -415,32 +408,6 @@
         </div>
       </div>
 
-      <!-- ===========================================
-         TAB: GIẢI TRÍ (RELAX)
-         =========================================== -->
-      <div id="tab_relax" class="tab-content">
-        <div class="relax-section">
-          <h3>🎵 Nhạc Tập Trung</h3>
-          <div class="audio-list" id="musicList"></div>
-        </div>
-        <div class="relax-section">
-          <h3>📖 Truyện Cổ Tích Audio</h3>
-          <div class="audio-list" id="storyList"></div>
-        </div>
-        <div id="audioPlayerContainer" class="audio-player-fixed" style="display:none">
-          <button class="btn-close-player" onclick="App.stopAudio()">✕</button>
-          <div class="player-info">
-            <span id="nowPlayingIcon">🎵</span>
-            <span id="nowPlayingName">Đang phát...</span>
-          </div>
-          <audio id="mainAudioPlayer" controls></audio>
-          <div class="player-controls-extra">
-            <span class="volume-icon">🔊</span>
-            <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="0.35" class="volume-slider"
-              oninput="App.changeVolume(this.value)">
-          </div>
-        </div>
-      </div>
 
       <!-- ===========================================
          TAB: PHẦN THƯỞNG & SAO
@@ -501,11 +468,32 @@
          TAB: BÁC TÂN (PARENT DASHBOARD)
          =========================================== -->
       <div id="tab_parent" class="tab-content">
-        <div class="parent-lock" id="parentLock">
-          <h3>🔑 Khu vực của Bác Tân</h3>
-          <p>Vui lòng nhập mật mã để xem báo cáo (Gợi ý: 1234)</p>
-          <input type="password" id="parentPin" placeholder="Mật mã..." maxlength="4">
-          <button class="btn-checkin" onclick="App.unlockParent()">Mở Khóa</button>
+        <div class="parent-lock-container" id="parentLock">
+          <div class="lock-card glass">
+            <div class="lock-icon">🔐</div>
+            <h3>Khu vực Quản lý</h3>
+            <p>Vui lòng nhập mật mã của Bác Tân</p>
+            <div class="pin-display">
+              <span class="pin-dot"></span>
+              <span class="pin-dot"></span>
+              <span class="pin-dot"></span>
+              <span class="pin-dot"></span>
+            </div>
+            <div class="numpad">
+              <button onclick="App.inputPin('1')">1</button>
+              <button onclick="App.inputPin('2')">2</button>
+              <button onclick="App.inputPin('3')">3</button>
+              <button onclick="App.inputPin('4')">4</button>
+              <button onclick="App.inputPin('5')">5</button>
+              <button onclick="App.inputPin('6')">6</button>
+              <button onclick="App.inputPin('7')">7</button>
+              <button onclick="App.inputPin('8')">8</button>
+              <button onclick="App.inputPin('9')">9</button>
+              <button onclick="App.clearPin()">C</button>
+              <button onclick="App.inputPin('0')">0</button>
+              <button onclick="App.unlockParent()">OK</button>
+            </div>
+          </div>
         </div>
 
         <div id="parentDashboard" style="display:none">
@@ -557,8 +545,7 @@
               <input type="number" id="giftAmount" class="parent-input" placeholder="Số sao tặng..." min="1" max="50">
               <input type="text" id="giftReason" class="parent-input"
                 placeholder="Lý do tặng (ví dụ: Ngoan, giúp mẹ...)">
-              <button class="btn-checkin" style="width:100%; margin-top:10px" onclick="App.parentGiftStars()">Xác nhận
-                Tặng Sao 🎁</button>
+              <button class="btn-checkin btn-small" style="margin-top:10px; background:var(--yellow); color:var(--text)" onclick="App.parentGiftStars()">Xác nhận Tặng Sao 🎁</button>
             </div>
 
             <div class="gift-suggestions"
@@ -583,20 +570,39 @@
               <div class="gift-form">
                 <textarea id="parentMsgContent" class="parent-input"
                   placeholder="Bác Tân nhắn: Con hôm nay rất ngoan..." rows="2" style="padding:10px"></textarea>
-                <button class="btn-checkin" onclick="App.sendSecretMsg()"
-                  style="margin-top:10px; background:var(--blue)">🚀 Gửi Tin Nhắn</button>
+                <button class="btn-checkin btn-small" onclick="App.sendSecretMsg()"
+                  style="margin-top:10px; background:var(--blue); color:white">🚀 Gửi Tin Nhắn</button>
               </div>
             </div>
 
             <div class="system-section" style="margin-top:30px; padding-top:20px; border-top:2px solid var(--border)">
-              <h3>💾 Hệ Thống & Sao Lưu</h3>
-              <div class="backup-restore-group" style="display:flex; gap:10px; margin-top:15px">
-                <button class="btn-checkin" onclick="State.exportData()" style="flex:1; background:var(--green)">📥 Sao
+              <h3>💾 Hệ Thống & Đồng Bộ</h3>
+              <div class="backup-restore-group" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:15px">
+                <button class="btn-checkin btn-small" onclick="State.exportData()" style="background:var(--green); color:white">📥 Sao
                   Lưu (Backup)</button>
-                <button class="btn-checkin" onclick="document.getElementById('importFile').click()"
-                  style="flex:1; background:var(--orange)">📤 Khôi Phục (Restore)</button>
+                <button class="btn-checkin btn-small" onclick="document.getElementById('importFile').click()"
+                  style="background:var(--orange); color:white">📤 Khôi Phục (Restore)</button>
+                <button class="btn-checkin btn-small" onclick="alert('Bác hãy nháy đúp vào tệp PUSH.bat để đẩy code lên nhé!')"
+                  style="background:var(--blue); color:white">🚀 Đẩy Code Lên</button>
                 <input type="file" id="importFile" style="display:none" accept=".json"
                   onchange="App.handleImport(event)">
+              </div>
+
+              <!-- GitHub Sync Config -->
+              <div id="gitSyncConfigArea" style="margin-top:20px; padding:15px; background:rgba(124, 77, 255, 0.05); border-radius:15px; border:1px dashed var(--purple)">
+                <h4 style="margin-bottom:10px; color:var(--purple); font-size:16px">☁️ Cấu hình Đồng bộ Cloud GitHub</h4>
+                <p style="font-size:11px; margin-bottom:10px; color:var(--text-secondary)">
+                  Dữ liệu học tập sẽ tự động đồng bộ lên mây mỗi khi bé làm xong bài!
+                </p>
+                <input type="password" id="gitToken" class="parent-input" placeholder="GitHub Token (ghp_...)" style="margin-bottom:8px; font-size:14px; padding:10px">
+                <input type="text" id="gitRepo" class="parent-input" placeholder="Repo (Ví dụ: username/repo)" style="margin-bottom:8px; font-size:14px; padding:10px">
+                <div style="display:flex; flex-wrap:wrap; gap:8px">
+                  <button class="btn-checkin btn-small" onclick="App.saveGitSyncConfig()" style="background:var(--purple); color:white">Lưu Cấu Hình</button>
+                  <button class="btn-checkin btn-small" onclick="State.loadFromGithub()" style="background:var(--blue); color:white">Tải Dữ Liệu Từ Mây</button>
+                </div>
+                <p style="font-size:10px; color:var(--text-light); margin-top:10px; text-align:center">
+                  💡 Giúp Bác có thể kiểm soát tiến độ của bé từ bất cứ đâu.
+                </p>
               </div>
             </div>
           </div>
