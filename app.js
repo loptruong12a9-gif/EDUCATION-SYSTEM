@@ -895,7 +895,7 @@ const UI = {
                 <input type="text" class="bonus-input" id="input_bonus_${idx}"
                        placeholder="Nhập câu trả lời..." value="${savedAns || ''}"
                        oninput="App.saveBonusAnswer('${dateStr}', ${idx}, this.value)">
-                <button class="btn-voice" onclick="App.startVoice('input_bonus_${idx}', '${dateStr}', ${idx})" title="Nói câu trả lời">🎤</button>
+                <button class="btn-voice" onclick="App.startVoice(this, 'input_bonus_${idx}', '${dateStr}', ${idx})" title="Nói câu trả lời">🎤</button>
                 <button class="btn-check-bonus" onclick="App.checkBonus(${idx}, '${safeAnswer}', '${dateStr}', '${ex.subject}')">Kiểm tra</button>
               </div>
               <div class="bonus-result" id="res_bonus_${idx}"></div>
@@ -1640,45 +1640,55 @@ const App = {
     },
 
 
-    startVoice(inputId, dateStr, idx) {
+    startVoice(btn, inputId, dateStr, idx) {
         const input = document.getElementById(inputId);
-        const btn = event.currentTarget;
 
-        if (!('webkitSpeechRecognition' in window)) {
-            alert("❌ Trình duyệt của em không hỗ trợ nhận diện giọng nói. Hãy dùng Google Chrome nhé!");
+        if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+            alert("❌ Trình duyệt của em không hỗ trợ nhận diện giọng nói. Hãy dùng Google Chrome hoặc Edge nhé!");
             return;
         }
 
-        const recognition = new webkitSpeechRecognition();
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+        const recognition = new SpeechRecognition();
+        
         recognition.lang = 'vi-VN';
         recognition.interimResults = false;
         recognition.maxAlternatives = 1;
 
         recognition.onstart = () => {
-            btn.classList.add('listening');
+            if (btn) btn.classList.add('listening');
             this.showMiniPraise("🎙️ Đang nghe em nói...");
         };
 
         recognition.onerror = (event) => {
-            console.error(event.error);
-            btn.classList.remove('listening');
-            alert("⚠️ Có lỗi khi nghe giọng nói, em thử lại nhé!");
+            console.error('Speech recognition error:', event.error);
+            if (btn) btn.classList.remove('listening');
+            
+            let errorMsg = "⚠️ Có lỗi khi nghe giọng nói, em thử lại nhé!";
+            if (event.error === 'not-allowed') errorMsg = "❌ Em chưa cho phép ứng dụng sử dụng Micro. Hãy kiểm tra cài đặt trình duyệt nhé!";
+            else if (event.error === 'network') errorMsg = "⚠️ Lỗi mạng, em hãy kiểm tra wifi nhé!";
+            
+            alert(errorMsg);
         };
 
         recognition.onend = () => {
-            btn.classList.remove('listening');
+            if (btn) btn.classList.remove('listening');
         };
 
         recognition.onresult = (event) => {
             const speechToText = event.results[0][0].transcript;
-            input.value = speechToText;
-            this.saveBonusAnswer(dateStr, idx, speechToText);
-            this.showMiniPraise("✨ Đã nhận được câu trả lời!");
-            // Tự động kiểm tra nếu muốn
-            // this.checkBonus(idx, ..., dateStr, ...);
+            if (input) {
+                input.value = speechToText;
+                this.saveBonusAnswer(dateStr, idx, speechToText);
+                this.showMiniPraise("✨ Đã nhận được câu trả lời!");
+            }
         };
 
-        recognition.start();
+        try {
+            recognition.start();
+        } catch (e) {
+            console.error('Recognition start error:', e);
+        }
     },
 
     selectDay(dateStr) {
